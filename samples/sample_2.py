@@ -1,4 +1,4 @@
-import math
+import random
 import sys
 sys.path.append('../')
 
@@ -10,11 +10,14 @@ from mlab_tools.polyline import AnimatedPolyLine
 
 def animate_shield(shield, frame_no):
     shield.transform(rotate=frame_no, translate=(0,0,0.1))
+    new_color = (random.random(), random.random(), random.random())
+    shield.update_properties(color=new_color)
     if frame_no > 10: Stop()
 
 def animate_pipe(pipe, frame_no):
-    pipe.transform(rotate=(math.pi/2,0,0))
-    if frame_no > 5: StopAndRemove()
+    angle = 360/20
+    pipe.transform(rotate=(0,angle,0))
+    if frame_no > 20: StopAndRemove()
 
 def run_animation():
     animation = Animation(640, 480)

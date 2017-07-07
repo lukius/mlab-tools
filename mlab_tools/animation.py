@@ -46,9 +46,7 @@ class Animation(object):
     def add_animated_object(self, obj, anim, **props):
         actor = obj.get_actor()
 
-        properties = tvtk.Property(**props)
-        actor.property = properties
-        actor.mapper.update()
+        obj.update_properties(**props)
 
         self._add_actor(actor)
 

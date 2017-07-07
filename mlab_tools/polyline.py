@@ -7,6 +7,7 @@ from object import PolyObject
 class PolyLine(PolyObject):
     
     def __init__(self, points):
+        PolyObject.__init__(self)
         self.points = points
         self._configure(points)
 

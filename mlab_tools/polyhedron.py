@@ -102,6 +102,7 @@ class Polyhedron(PolyObject):
         return faces, points
 
     def __init__(self, points, faces):
+        PolyObject.__init__(self)
         self.points = points
         self.faces = faces
         self._configure()

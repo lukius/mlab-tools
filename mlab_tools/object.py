@@ -24,6 +24,10 @@ class PolyObject(object):
     def default_animation(self):
         return lambda obj, frame_no: Stop()
 
+    def update_properties(self, **props):
+        properties = tvtk.Property(**props)
+        self.actor.property = properties
+
     def transform(self, translate=None, scale=None, rotate=None):
         transform = tvtk.Transform()
 
