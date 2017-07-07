@@ -45,12 +45,17 @@ class PolyLine(PolyObject):
 
 class AnimatedPolyLine(PolyLine):
 
+    def __init__(self, points, initial_frame=1):
+        PolyLine.__init__(self, points)
+        self.initial_frame = initial_frame
+
     def _configure(self, points):
         PolyLine._configure(self, self.points[:1])
 
     def default_animation(self):
 
-        def anim(obj, frame_no):
+        def anim(obj, abs_frame_no):
+            frame_no = abs_frame_no - self.initial_frame + 1
             if frame_no >= len(self.points): Stop()
             self.add_point(self.points[frame_no])
 

@@ -2,9 +2,9 @@ import random
 import sys
 sys.path.append('../')
 
-
 from mlab_tools.animation import Animation, Stop, StopAndRemove
 from mlab_tools.polyhedron import Polyhedron
+
 
 def animate_shield(shield, frame_no):
     shield.transform(rotate=frame_no, translate=(0,0,0.1))

@@ -8,25 +8,23 @@ from tvtk.api import tvtk
 from tvtk.tools import visual
 
 
-class StopAnimation(Exception):
-
-    pass
-
-
-class AnimatorException(Exception):
+class AnimationException(Exception):
 
     def __init__(self):
         raise self
 
+class StopAnimation(AnimationException):
 
-class Stop(AnimatorException):
+    pass
+
+class Stop(AnimationException):
 
     pass
 
-
-class StopAndRemove(AnimatorException):
+class StopAndRemove(AnimationException):
 
     pass
+
 
 
 class Animation(object):
@@ -59,6 +57,11 @@ class Animation(object):
 
         self.obj_animations[obj] = anim
 
+    def remove_object(self, obj):
+        if obj in self.obj_animations:
+            del self.obj_animations[obj]
+        self._remove_actor(obj.get_actor())
+
     def _assemble_video(self, directory, filename, tmp_dir, framerate):
         import cv2
 
@@ -75,10 +78,34 @@ class Animation(object):
 
         video.release()
 
-    def _save_frame(self, tmp_dir, filename, frame_no):
-        mlab.savefig('%s/%s_%d.png' % (tmp_dir, filename, frame_no))
+    def _render_frame(self, frame_no, frame_callback, frame_name):
+        should_stop = True
+
+        for obj, anim in self.obj_animations.items():
+            actor = obj.get_actor()
+
+            try:
+                anim(obj, frame_no)
+            except (Stop, StopAndRemove) as action:
+                del self.obj_animations[obj]
+                if isinstance(action, StopAndRemove):
+                    self._remove_actor(actor)
+            else:
+               should_stop = False
+               self._add_actor(actor)
+
+        if frame_callback is not None:
+            frame_callback(frame_no, self)
+
+        if frame_name:
+            mlab.savefig('%s_%d.png' % (frame_name, frame_no))
+
+        if should_stop:
+            StopAnimation()
 
     def run(self, frame_callback=None, delay=30, save_to=None, framerate=30):
+
+        frame_name = None
 
         if save_to is not None:
             try:
@@ -93,36 +120,16 @@ class Animation(object):
                 tmp_dir = '%s/tmp_%d' % (directory, random.randint(1,10**6))
                 os.mkdir(tmp_dir)
 
+                frame_name = '%s/%s' % (tmp_dir, filename)
+
         @mlab.animate(delay=delay, ui=False)
         def _run():
             frame_no = 1
 
             while True:
-                should_stop = True
-
-                for obj, anim in self.obj_animations.items():
-                    actor = obj.get_actor()
-
-                    try:
-                        anim(obj, frame_no)
-                    except (Stop, StopAndRemove) as action:
-                        del self.obj_animations[obj]
-                        if isinstance(action, StopAndRemove):
-                            self._remove_actor(actor)
-                    else:
-                       should_stop = False
-                       self._add_actor(actor)
-
-                if frame_callback is not None:
-                    try:
-                        frame_callback(frame_no)
-                    except StopAnimation:
-                        should_stop = True
-
-                if save_to is not None:
-                    self._save_frame(tmp_dir, filename, frame_no)
-
-                if should_stop:
+                try:
+                    self._render_frame(frame_no, frame_callback, frame_name)
+                except StopAnimation:
                     mlab.close(all=True)
                     break
 
