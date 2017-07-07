@@ -1,5 +1,7 @@
 from tvtk.api import tvtk
 
+from animation import Stop
+
 
 class PolyObject(object):
 
@@ -20,7 +22,7 @@ class PolyObject(object):
         return self.actor
 
     def default_animation(self):
-        return lambda obj, frame_no: True
+        return lambda obj, frame_no: Stop()
 
     def transform(self, translate=None, scale=None, rotate=None):
         transform = tvtk.Transform()

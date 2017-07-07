@@ -1,5 +1,6 @@
 from tvtk.api import tvtk
 
+from animation import Stop
 from object import PolyObject
 
 
@@ -47,10 +48,9 @@ class AnimatedPolyLine(PolyLine):
         PolyLine._configure(self, self.points[:1])
 
     def default_animation(self):
+
         def anim(obj, frame_no):
-            if frame_no < len(self.points):
-                self.add_point(self.points[frame_no])
-                return False
-            return True
+            if frame_no >= len(self.points): Stop()
+            self.add_point(self.points[frame_no])
 
         return anim

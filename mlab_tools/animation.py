@@ -8,6 +8,22 @@ class StopAnimation(Exception):
     pass
 
 
+class AnimatorException(Exception):
+
+    def __init__(self):
+        raise self
+
+
+class Stop(AnimatorException):
+
+    pass
+
+
+class StopAndRemove(AnimatorException):
+
+    pass
+
+
 class Animation(object):
 
     def __init__(self, width, height):
@@ -18,6 +34,10 @@ class Animation(object):
     def _add_actor(self, actor):
         viewer = visual.get_viewer()
         viewer.scene.add_actors(actor)
+
+    def _remove_actor(self, actor):
+        viewer = visual.get_viewer()
+        viewer.scene.remove_actors(actor)
 
     def add_object(self, obj, **props):
         default_animation = obj.default_animation()
@@ -35,6 +55,7 @@ class Animation(object):
         self.obj_animations[obj] = anim
 
     def run(self, frame_callback=None, delay=30):
+
         @mlab.show
         @mlab.animate(delay=delay)
         def _run():
@@ -45,11 +66,17 @@ class Animation(object):
                 should_stop = True
 
                 for obj, anim in self.obj_animations.items():
-                    if anim(obj, frame_no):
+                    actor = obj.get_actor()
+
+                    try:
+                        anim(obj, frame_no)
+                    except (Stop, StopAndRemove) as action:
                         del self.obj_animations[obj]
+                        if isinstance(action, StopAndRemove):
+                            self._remove_actor(actor)
                     else:
-                        should_stop = False
-                    self._add_actor(obj.get_actor())
+                       should_stop = False
+                       self._add_actor(actor)
 
                 if frame_callback is not None:
                     try:

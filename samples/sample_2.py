@@ -1,13 +1,20 @@
+import math
 import sys
 sys.path.append('../')
 
-from mlab_tools.animation import Animation, StopAnimation
+
+from mlab_tools.animation import Animation, Stop, StopAndRemove
 from mlab_tools.polyhedron import Polyhedron
 from mlab_tools.polyline import AnimatedPolyLine
 
-def transform_shield(shield, frame_no):
-    shield.transform(rotate=frame_no, translate=(0,0,0.5))
-    return frame_no > 6
+
+def animate_shield(shield, frame_no):
+    shield.transform(rotate=frame_no, translate=(0,0,0.1))
+    if frame_no > 10: Stop()
+
+def animate_pipe(pipe, frame_no):
+    pipe.transform(rotate=(math.pi/2,0,0))
+    if frame_no > 5: StopAndRemove()
 
 def run_animation():
     animation = Animation(640, 480)
@@ -20,8 +27,8 @@ def run_animation():
 
     polyline = AnimatedPolyLine([(0,0,0), (0,5,0), (2,2,0), (0,2,2), (2,2,7)])
 
-    animation.add_object(pipe, opacity=0.5)
-    animation.add_animated_object(shield, transform_shield, color=(0,0,1))
+    animation.add_animated_object(pipe, animate_pipe, opacity=0.5)
+    animation.add_animated_object(shield, animate_shield, color=(0,0,1))
     animation.add_object(polyline, color=(1,0,0))
 
     animation.run(delay=300)
