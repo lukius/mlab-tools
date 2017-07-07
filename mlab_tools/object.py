@@ -29,7 +29,7 @@ class PolyObject(object):
         self.actor.property = properties
 
     def transform(self, translate=None, scale=None, rotate=None):
-        transform = tvtk.Transform()
+        transform = self.actor.user_transform or tvtk.Transform()
 
         if translate is not None:
             transform.translate(self._to_tuple(translate))
@@ -43,6 +43,4 @@ class PolyObject(object):
             transform.rotate_y(rotate[1])
             transform.rotate_z(rotate[2])
         
-        current = self.actor.user_transform or tvtk.Transform()
-        transform.concatenate(current)
         self.actor.user_transform = transform
