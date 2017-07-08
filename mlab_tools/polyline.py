@@ -55,7 +55,7 @@ class AnimatedPolyLine(PolyLine):
     def default_animation(self):
 
         def anim(obj, abs_frame_no):
-            frame_no = abs_frame_no - self.initial_frame + 1
+            frame_no = abs_frame_no - self.initial_frame
             if frame_no >= len(self.points): Stop()
             self.add_point(self.points[frame_no])
 
