@@ -5,7 +5,7 @@ sys.path.append('../')
 from mlab_tools.animation import Animation, StopAnimation
 from mlab_tools.point import Point
 from mlab_tools.polyline import AnimatedPolyLine
-from mlab_tools.sphere import Sphere
+from mlab_tools.primitive import Sphere, Box, Cone, Cylinder
 
 
 points = list()
@@ -37,9 +37,21 @@ def frame_callback(frame_no, animation):
 def run_animation():
     animation = Animation(800, 600)
 
-    sphere = Sphere(center=(1,1,1), radius=1)
+    sphere = Sphere(center=(1,1,1), radius=1, theta_res=20, phi_res=20)
+    
+    cone = Cone(radius=0.4, height=0.5, resolution=20)
+    cone.transform(translate=1)
+    
+    cylinder = Cylinder(radius=0.1, height=0.5, resolution=20)
+    cylinder.transform(translate=1.3)
+    
+    box = Box(0.2,0.2,1)
+    box.transform(translate=1.8)
 
-    animation.add_animated_object(sphere, animate_obj, color=(0,1,0))
+    animation.add_animated_object(sphere, animate_obj, color=(0,1,0), opacity=0.5)
+    animation.add_animated_object(box, animate_obj, color=(1,1,0))
+    animation.add_animated_object(cone, animate_obj, color=(1,0,1))
+    animation.add_animated_object(cylinder, animate_obj, color=(0,0,1))
 
     animation.run(frame_callback=frame_callback, delay=200)
 

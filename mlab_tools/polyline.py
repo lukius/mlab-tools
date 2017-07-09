@@ -2,7 +2,7 @@ from tvtk.api import tvtk
 
 from animation import Stop
 from object import PolyObject
-from sphere import Sphere
+from primitive import Sphere
 
 
 class PolyLine(PolyObject):

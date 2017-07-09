@@ -1,4 +1,4 @@
-from sphere import Sphere
+from primitive import Sphere
 
 
 def Point(x, y, z, thickness=1e-2):
