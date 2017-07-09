@@ -2,6 +2,7 @@ from tvtk.api import tvtk
 
 from animation import Stop
 from object import PolyObject
+from sphere import Sphere
 
 
 class PolyLine(PolyObject):
@@ -11,12 +12,17 @@ class PolyLine(PolyObject):
         self.points = points
         self._configure(points)
 
+    def _to_float_tuple(self, point):
+        if isinstance(point, Sphere):
+            point = point.center
+        return point
+
     def _configure(self, points):
         self.vtk_points = tvtk.Points()
         self.lines = tvtk.CellArray()
 
         for point in points:
-            self.vtk_points.insert_next_point(point)
+            self.vtk_points.insert_next_point(self._to_float_tuple(point))
          
         for i in xrange(len(points)-1):
             line = tvtk.Line()
@@ -31,7 +37,7 @@ class PolyLine(PolyObject):
     def add_point(self, point):
         idx = len(self.vtk_points) - 1
 
-        self.vtk_points.insert_next_point(point)
+        self.vtk_points.insert_next_point(self._to_float_tuple(point))
         
         line = tvtk.Line()
         line.point_ids.set_id(0, idx)
