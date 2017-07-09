@@ -96,6 +96,7 @@ class Animation(object):
 
         if frame_callback is not None:
             frame_callback(frame_no, self)
+            should_stop = False
 
         if frame_name:
             mlab.savefig('%s_%d.png' % (frame_name, frame_no))
