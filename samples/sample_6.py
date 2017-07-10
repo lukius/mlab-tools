@@ -13,6 +13,8 @@ def animate_obj(obj, frame_no):
     obj.transform(rotate=(1,1,1))
 
 def frame_callback(frame_no, animation):
+    animation.update_camera(distance=0.1, elevation=5)
+    
     if frame_no == 1:
         cube = Cube(length=10)
         animation.add_object(cube, color=(1,1,1), opacity=0.1)
@@ -32,6 +34,8 @@ def frame_callback(frame_no, animation):
 
 def run_animation():
     animation = Animation(800, 600)
+    
+    animation.update_camera(distance=30)
     animation.run(frame_callback=frame_callback, delay=200)
 
 

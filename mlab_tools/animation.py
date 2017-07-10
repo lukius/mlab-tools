@@ -7,6 +7,8 @@ from mayavi import mlab
 from tvtk.api import tvtk
 from tvtk.tools import visual
 
+from camera import Camera
+
 
 class AnimationException(Exception):
 
@@ -35,6 +37,7 @@ class Animation(object):
         figure = mlab.figure(size=(width, height))
         visual.set_viewer(figure)
         self.obj_animations = dict()
+        self.camera = Camera()
 
     def _add_actor(self, actor):
         viewer = visual.get_viewer()
@@ -43,6 +46,14 @@ class Animation(object):
     def _remove_actor(self, actor):
         viewer = visual.get_viewer()
         viewer.scene.remove_actors(actor)
+        
+    def update_camera(self, focalpoint=None, distance=None,
+                      azimuth=None, elevation=None, roll=None):
+        self.camera.update(focalpoint=focalpoint,
+                           distance=distance,
+                           azimuth=azimuth,
+                           elevation=elevation,
+                           roll=roll)
 
     def add_object(self, obj, **props):
         default_animation = obj.default_animation()
@@ -91,8 +102,8 @@ class Animation(object):
                 if isinstance(action, StopAndRemove):
                     self._remove_actor(actor)
             else:
-               should_stop = False
-               self._add_actor(actor)
+                should_stop = False
+                self._add_actor(actor)
 
         if frame_callback is not None:
             frame_callback(frame_no, self)
