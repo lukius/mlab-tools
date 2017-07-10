@@ -21,6 +21,16 @@ class Camera(object):
                   focalpoint=self.focalpoint,
                   roll=self.roll)
         
+    def parameters(self):
+        self.azimuth, self.elevation, self.distance, self.focalpoint = mlab.view()
+        self.roll = mlab.roll()
+
+        return {'focalpoint' : self.focalpoint,
+                'distance' : self.distance,
+                'azimuth' : self.azimuth,
+                'elevation' : self.elevation,
+                'roll' : self.roll}
+        
     def update(self, focalpoint=None, distance=None,
                azimuth=None, elevation=None, roll=None):
         self.focalpoint = focalpoint or self.focalpoint

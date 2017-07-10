@@ -47,6 +47,9 @@ class Animation(object):
         viewer = visual.get_viewer()
         viewer.scene.remove_actors(actor)
         
+    def get_camera(self):
+        return self.camera
+        
     def update_camera(self, focalpoint=None, distance=None,
                       azimuth=None, elevation=None, roll=None):
         self.camera.update(focalpoint=focalpoint,
