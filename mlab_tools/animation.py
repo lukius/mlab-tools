@@ -32,12 +32,16 @@ class StopAndRemove(AnimationException):
 class Animation(object):
 
     def __init__(self, width, height):
-        self.width = width
-        self.height = height
         figure = mlab.figure(size=(width, height))
         visual.set_viewer(figure)
-        self.obj_animations = dict()
+        
+        self.width = width
+        self.height = height
+        
         self.camera = Camera()
+        
+        self.frame_callbacks = [self.on_frame]
+        self.obj_animations = dict()
 
     def _add_actor(self, actor):
         viewer = visual.get_viewer()
@@ -92,7 +96,7 @@ class Animation(object):
 
         video.release()
 
-    def _render_frame(self, frame_no, frame_callback, frame_name):
+    def _render_frame(self, frame_no, frame_name):
         should_stop = True
 
         for obj, anim in self.obj_animations.items():
@@ -108,9 +112,13 @@ class Animation(object):
                 should_stop = False
                 self._add_actor(actor)
 
-        if frame_callback is not None:
-            frame_callback(frame_no, self)
-            should_stop = False
+        for index, callback in enumerate(self.frame_callbacks):
+            try:
+                callback(frame_no)
+            except Stop:
+                del self.frame_callbacks[index]
+            else:
+                should_stop = False
 
         if frame_name:
             mlab.savefig('%s_%d.png' % (frame_name, frame_no))
@@ -118,7 +126,7 @@ class Animation(object):
         if should_stop:
             StopAnimation()
 
-    def run(self, frame_callback=None, delay=30, save_to=None, framerate=30):
+    def run(self, delay=30, save_to=None, framerate=30):
 
         frame_name = None
 
@@ -143,7 +151,7 @@ class Animation(object):
 
             while True:
                 try:
-                    self._render_frame(frame_no, frame_callback, frame_name)
+                    self._render_frame(frame_no, frame_name)
                 except StopAnimation:
                     mlab.close(all=True)
                     break
@@ -152,6 +160,7 @@ class Animation(object):
 
                 frame_no += 1
 
+        self.initialize()
         _ = _run()
         mlab.show()
 
@@ -160,3 +169,9 @@ class Animation(object):
                                  tmp_dir,
                                  framerate)
             shutil.rmtree(tmp_dir)
+
+    def initialize(self):
+        pass
+
+    def on_frame(self, frame_no):
+        Stop()
