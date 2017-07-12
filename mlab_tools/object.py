@@ -12,7 +12,7 @@ class Object(object):
     def get_actor(self):
         return self.actor
 
-    def default_animation(self):
+    def default_animator(self):
         return lambda obj, frame_no: Stop()
 
     def update_properties(self, **props):

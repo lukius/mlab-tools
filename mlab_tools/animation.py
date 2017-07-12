@@ -16,20 +16,44 @@ class AnimationException(Exception):
         raise self
 
 class StopAnimation(AnimationException):
+    
+    """Stop the animation.
+    Can be instanciated inside any animator callback to immediately end the
+    animation.
+    """
 
     pass
 
 class Stop(AnimationException):
+    
+    """Stop the current animator.
+    Note that this will not terminate the animation (see StopAnimation).
+    """
 
     pass
 
 class StopAndRemove(AnimationException):
+    
+    """Stop the current animator and remove the current object from the scene.
+    Note that this will not terminate the animation (see StopAnimation).
+    """
 
     pass
 
 
 
 class Animation(object):
+    
+    """Base class for custom animations.
+    An animation is a sequence of frames, which in turn consist of objects.
+    Objects can be added to or removed from the scene at any point of the
+    animation. When adding an object, an associated animator can be supplied.
+    This animator, which defines the behavior of the object along the
+    animation, will be automatically called for each frame. If no animator is
+    provided, a default animator that (typically) leaves the object still
+    will be chosen. Also, a frame callback controlling the global behavior of
+    the animation will be called frame after frame.
+    """
 
     def __init__(self, width, height):
         figure = mlab.figure(size=(width, height))
@@ -56,6 +80,29 @@ class Animation(object):
         
     def update_camera(self, focalpoint=None, distance=None,
                       azimuth=None, elevation=None, roll=None):
+        """Updates the animation camera.
+        Parameters are additive (e.g., if distance=d is supplied, the camera
+        will have an increase of d in its distance after this call).
+        
+        Keyword arguments:
+        
+        :azimuth: the azimuthal angle (in degrees, 0-360), i.e. the angle
+        subtended by the position vector on a sphere projected on to the x-y
+        plane with the x-axis.
+        
+        :distance: a positive floating point number representing the distance
+        from the focal point to place the camera.
+        
+        :elevation: the zenith angle (in degrees, 0-180), i.e. the angle
+        subtended by the position vector and the z-axis.
+        
+        :focalpoint: an array of 3 floating point numbers representing the
+        focal point of the camera. 
+        
+        :roll: the rotation of the camera around its axis.
+        
+        See mlab documentation for further details.
+        """
         self.camera.update(focalpoint=focalpoint,
                            distance=distance,
                            azimuth=azimuth,
@@ -63,10 +110,33 @@ class Animation(object):
                            roll=roll)
 
     def add_object(self, obj, **props):
-        default_animation = obj.default_animation()
-        self.add_animated_object(obj, default_animation, **props)
+        """Adds an object to the scene (using its default animator).
+        
+        Arguments:
+        
+        :obj: an instance of object.Object.
+        
+        :props: keyword arguments specifying the object properties, such as
+        color, opacity, etc. See VTK documentation for futher details.
+        """
+        default_animator = obj.default_animator()
+        self.add_animated_object(obj, default_animator, **props)
 
     def add_animated_object(self, obj, anim, **props):
+        """Adds an object to the scene with an user-supplied animator.
+        
+        Arguments:
+        
+        :obj: an instance of object.Object.
+        
+        :anim: the animator that defines the behavior of this object during the
+        animation. It should be a callable Python object expecting two
+        arguments: an object (which will be `obj`) and a frame number. Note that
+        the same animator can be reused for multiple objects.
+        
+        :props: keyword arguments specifying the object properties, such as
+        color, opacity, etc. See VTK documentation for futher details.
+        """        
         actor = obj.get_actor()
 
         obj.update_properties(**props)
@@ -76,11 +146,19 @@ class Animation(object):
         self.obj_animations[obj] = anim
 
     def remove_object(self, obj):
+        """Removes an object from the scene.
+        
+        Arguments:
+        
+        :obj: an instance of object.Object.
+        """
         if obj in self.obj_animations:
             del self.obj_animations[obj]
         self._remove_actor(obj.get_actor())
 
     def _assemble_video(self, directory, filename, tmp_dir, framerate):
+        # Compiles the saved PNG frames into a video using the OpenCV library.
+        
         import cv2
 
         video = cv2.VideoWriter('%s/%s.avi' % (directory, filename),
@@ -97,6 +175,8 @@ class Animation(object):
         video.release()
 
     def _render_frame(self, frame_no, frame_name):
+        # Frame rendering method called during the animation loop.
+        
         should_stop = True
 
         for obj, anim in self.obj_animations.items():
@@ -127,6 +207,27 @@ class Animation(object):
             StopAnimation()
 
     def run(self, delay=30, save_to=None, framerate=30):
+        """Runs the animation.
+        For each object in the scene, the associated animators are called in
+        sequence with an increasing number that identifies the current frame.
+        Then, the global frame callback is invoked. This animation loop ends
+        whenever StopAnimation is raised or otherwise if no custom global
+        frame callback is defined and every added object is stopped.
+        
+        A video of the animation can be optionally saved. In order to use this
+        functionality, the Python bindings for OpenCV have to be installed.
+        
+        Keyword arguments:
+        
+        :delay: time interval in milliseconds between calls to the frame
+        rendering loop (default: 30).
+        
+        :save_to: name to use for the video file of the animation (defaults to
+        None, meaning that the video will not be saved).
+        
+        :framerate: framerate of the video (only valid is `save_to` is
+        provided).
+        """
 
         frame_name = None
 
@@ -171,7 +272,19 @@ class Animation(object):
             shutil.rmtree(tmp_dir)
 
     def initialize(self):
+        """Initialization method that is called before running the animation.
+        Typically used for setting up the scene and the initial objects to be
+        rendered.
+        """
         pass
 
     def on_frame(self, frame_no):
+        """Frame callback to control the global behavior of the animation. By
+        default, it raises a Stop (which implies that the callback will no 
+        longer be used after the first frame).
+        
+        Arguments:
+        
+        :frame_no: current frame number.
+        """
         Stop()

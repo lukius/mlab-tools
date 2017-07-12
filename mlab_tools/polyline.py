@@ -58,7 +58,7 @@ class AnimatedPolyLine(PolyLine):
     def _configure(self, points):
         PolyLine._configure(self, self.points[:1])
 
-    def default_animation(self):
+    def default_animator(self):
 
         def anim(obj, abs_frame_no):
             frame_no = abs_frame_no - self.initial_frame
