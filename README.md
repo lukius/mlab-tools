@@ -33,7 +33,8 @@ In the [examples](examples) folder you can find the following demos:
  * [Animated polyhedrons](examples/animated_polyhedrons.py), another basic animation that transforms two OFF-based polyhedrons and dynamically updates some of their properties (such as their color).
  * [Polyhedron and lines](examples/polyhedron_and_random_lines.py), an animation that shows an OFF-based polyhedron rotating and randomly changing colors along with some random polylines appearing and disappearing.
  * [Primitives and points](examples/primitives_and_points.py), where some primitive shapes (namely, sphere, cube, cone and cylinder) are displayed and an animate polyline progressively joins a random set of points.
- * [Rotating cubes](examples/rotating_cubes.py), an animation where cubes of random sizes and colors are generated on each frame and keep rotating.
+ * [Rotating cubes](examples/rotating_cubes.py), an animation where cubes of random sizes and colors are generated on each frame and keep rotating:
+ [https://user-images.githubusercontent.com/5144049/28150484-3c38eb66-676b-11e7-8cd1-04ef8ea70f54.gif]
  * [Helix in detector](examples/detector_helix.py), a more complex animation that shows a small fragment of a particle detector, zooming into it to reveal a particle describing a helicoidal trajectory inside.
 
 ## License
