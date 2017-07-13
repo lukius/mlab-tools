@@ -8,6 +8,8 @@ from mlab_tools.polyhedron import Polyhedron
 
 class TwoPolyhedrons(Animation):
     
+    """Basic animation that moves two OFF-based polyhedrons."""
+    
     def animate_shield(self, shield, frame_no):
         shield.transform(rotate=frame_no, translate=(0,0,0.1))
         new_color = (random.random(), random.random(), random.random())
@@ -19,6 +21,10 @@ class TwoPolyhedrons(Animation):
         if frame_no > 10: StopAndRemove()
 
     def initialize(self):
+        # The animation is set up here. Note that no frame callback is defined
+        # as the on_frame method is not overriden. This means that the
+        # animation flow is completely controlled by the two animators of 
+        # the polyhedrons.
         pipe = Polyhedron.from_OFF('volumes/beampipe.off')
         pipe.transform(translate=1, scale=1e-3)
     
@@ -31,7 +37,9 @@ class TwoPolyhedrons(Animation):
 
 def run_animation():
     animation = TwoPolyhedrons(640, 480)
-    animation.run(delay=300, save_to='sample_3', framerate=2)
+    # The animation will also be saved to a video named 'polyhedrons.avi' and
+    # will feature two frames per second.
+    animation.run(delay=300, save_to='polyhedrons', framerate=2)
 
 
 if __name__ == '__main__':

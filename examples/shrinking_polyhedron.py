@@ -7,6 +7,8 @@ from mlab_tools.polyhedron import Polyhedron
 
 class ShrinkingPolyhedron(Animation):
     
+    """Basic animation that shrinks a polyhedron by 20% on each frame."""
+    
     def animate_polyhedron(self, polyhedron, frame_no):
         polyhedron.transform(scale=0.8)
         if frame_no > 10: StopAnimation()

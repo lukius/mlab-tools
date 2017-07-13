@@ -8,6 +8,10 @@ from mlab_tools.polyline import AnimatedPolyLine
 
 
 class PolyhedronAndLines(Animation):
+    
+    """This shows an OFF-based polyhedron rotating and randomly changing
+    colors along with random polylines. 
+    """
 
     def rand_color(self):
         return (random.random(), random.random(), random.random())

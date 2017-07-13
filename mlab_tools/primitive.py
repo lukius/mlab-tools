@@ -5,6 +5,10 @@ from object import Object
 
 
 class Primitive(Object):
+    
+    """Base class for 'primitive' objects (i.e., those based on some of the
+    vtkPolyDataAlgorithm subclasses).
+    """
 
     def _get_primitive(self):
         raise NotImplementedError

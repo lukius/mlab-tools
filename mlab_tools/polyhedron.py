@@ -6,9 +6,22 @@ from object import PolyObject
 
 
 class Polyhedron(PolyObject):
+    
+    """Class that represents arbitrary polyhedrons.
+    
+    Supports a subset of the OFF file format (basically, triangulated
+    polyhedrons).
+    """
 
     @classmethod
     def from_OFF(cls, filename):
+        """Builds a `Polyhedron` instance from a given OFF file.
+        
+        Arguments:
+        
+        :filename: path to an OFF (Object File Format) file. Supports
+        a basic subset of the format (polyhedrons with triangular faces).
+        """
         faces, points = cls._parse_OFF(filename)
         return cls(points, faces)
 

@@ -10,6 +10,11 @@ from mlab_tools.point import Point
 
 class HelixInDetector(Animation):
     
+    """A more complex animation that shows a small fragment of a particle
+    detector, zooming into it to reveal a particle describing a helicoidal
+    trajectory inside. Some points are distinguished in the trajectory;
+    they represent boundary points in the geometry."""
+    
     INIT_ROLL    = 2.588
     INIT_DIST    = 18555.628
     INIT_ELEV    = 27.673

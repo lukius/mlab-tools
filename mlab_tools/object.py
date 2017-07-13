@@ -4,6 +4,8 @@ from animation import Stop
 
 
 class Object(object):
+    
+    """Base class for objects that can be placed into the scene."""
 
     def _set_actor(self):
         self.actor = tvtk.Actor(mapper=self.mapper)
@@ -13,9 +15,12 @@ class Object(object):
         return self.actor
 
     def default_animator(self):
+        """Returns the default animator, which leaves the object still."""
         return lambda obj, frame_no: Stop()
 
     def update_properties(self, **props):
+        """Updates the object properties, such as opacity, color, etc. (see VTK
+        documentation for further details)."""
         properties = tvtk.Property(**props)
         self.actor.property = properties
 
@@ -26,6 +31,12 @@ class Object(object):
             return value, value, value
 
     def transform(self, translate=None, scale=None, rotate=None):
+        """Applies an affine transformation to the current object.
+        
+        Keyword arguments are self explanatory. They can be a tuple or list
+        representing the three-dimensional vector or a single number to use
+        for each of the three components.
+        """
         transform = self.actor.user_transform or tvtk.Transform()
 
         if translate is not None:
@@ -44,6 +55,8 @@ class Object(object):
 
 
 class PolyObject(Object):
+    
+    """Base class for objects based on vtkPolyData."""
 
     def _set_actor(self):
         self.mapper = tvtk.PolyDataMapper()

@@ -7,7 +7,18 @@ from primitive import Sphere
 
 class PolyLine(PolyObject):
     
+    """Class that represents a polyline (i.e., a continuous line that is made
+    up of several linear segments).
+    """
+    
     def __init__(self, points):
+        """Build a polyline from a given list of points.
+        
+        Arguments:
+        
+        :points: a list of points of the form (x, y, z) or objects returned by
+        the Point function.
+        """
         PolyObject.__init__(self)
         self.points = points
         self._configure(points)
@@ -35,6 +46,13 @@ class PolyLine(PolyObject):
         self._set_actor()
 
     def add_point(self, point):
+        """Adds a point to the polyline.
+        
+        Arguments:
+        
+        :point: a point of the form (x, y, z) or an object returned by the
+        Point function. 
+        """
         idx = len(self.vtk_points) - 1
 
         self.vtk_points.insert_next_point(self._to_float_tuple(point))
@@ -50,8 +68,25 @@ class PolyLine(PolyObject):
 
 
 class AnimatedPolyLine(PolyLine):
+    
+    """An animated polyline (see PolyLine class for further details).
+    
+    Points in the this polyline will be progressively added frame after frame.
+    This is achieved by a custom animator provided by the `default_animator`
+    method.
+    """
 
     def __init__(self, points, initial_frame=1):
+        """Build an animated polyline from a given list of points.
+        
+        Arguments:
+        
+        :points: a list of points of the form (x, y, z) or objects returned by
+        the Point function.
+        
+        :initial_frame: number of the first frame on which this polyline
+        appears on scene (defaults to 1).
+        """        
         PolyLine.__init__(self, points)
         self.initial_frame = initial_frame
 
@@ -61,6 +96,7 @@ class AnimatedPolyLine(PolyLine):
     def default_animator(self):
 
         def anim(obj, abs_frame_no):
+            # Compute frame number relative to the starting point of this line.
             frame_no = abs_frame_no - self.initial_frame
             if frame_no >= len(self.points): Stop()
             self.add_point(self.points[frame_no])

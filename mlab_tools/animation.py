@@ -69,6 +69,7 @@ class Animation(object):
 
     def _add_actor(self, actor):
         viewer = visual.get_viewer()
+        # Avoiding mlab.add_actor since it resets the zoom.
         viewer.scene.add_actors(actor)
 
     def _remove_actor(self, actor):
@@ -137,11 +138,9 @@ class Animation(object):
         :props: keyword arguments specifying the object properties, such as
         color, opacity, etc. See VTK documentation for futher details.
         """        
-        actor = obj.get_actor()
-
         obj.update_properties(**props)
 
-        self._add_actor(actor)
+        self._add_actor(obj.get_actor())
 
         self.obj_animations[obj] = anim
 
@@ -161,6 +160,7 @@ class Animation(object):
         
         import cv2
 
+        # TODO: add support for OpenCV 3.0.
         video = cv2.VideoWriter('%s/%s.avi' % (directory, filename),
                                 cv2.cv.CV_FOURCC(*'XVID'),
                                 framerate,
