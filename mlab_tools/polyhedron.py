@@ -88,25 +88,30 @@ class Polyhedron(PolyObject):
 
                 if faces_read < n_faces:
                     # TODO: add support for non-triangular faces.
-                    match = re.match('(\d+)\s+(\d+)\s+(\d+)\s+(\d+).*', line)
+                    match = re.match('(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*(\d+)?.*', line)
 
                     if match is None:
                         raise Exception('Wrong format!')
 
                     f_verts = int(match.groups()[0])
-                    if f_verts != 3:
-                        raise Exception('Non-triangular faces not supported.')
+                    if f_verts not in [3,4]:
+                        raise Exception('Faces should have three or four vertices!')
                     
                     vert0 = int(match.groups()[1])
                     vert1 = int(match.groups()[2])
                     vert2 = int(match.groups()[3])
 
-                    triangle = tvtk.Triangle()
-                    triangle.point_ids.set_id(0, vert0)
-                    triangle.point_ids.set_id(1, vert1)
-                    triangle.point_ids.set_id(2, vert2)
+                    polygon = tvtk.Polygon()
+                    polygon.point_ids.number_of_ids = f_verts
+                    polygon.point_ids.set_id(0, vert0)
+                    polygon.point_ids.set_id(1, vert1)
+                    polygon.point_ids.set_id(2, vert2)
 
-                    faces.insert_next_cell(triangle)
+                    if f_verts == 4:
+                        vert3 = int(match.groups()[4])
+                        polygon.point_ids.set_id(3, vert3)
+
+                    faces.insert_next_cell(polygon)
 
                     faces_read += 1
 
