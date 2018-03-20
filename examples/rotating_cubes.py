@@ -17,8 +17,8 @@ class RotatingCubes(Animation):
         self.update_camera(distance=30)
     
     def on_frame(self, frame_no):
-        # Slightly zoom into the cubes and rotate (elevate) the camera on each
-        # frame.
+        # Slightly zoom out (increase camera distance) and rotate (elevate) the camera on
+        # each frame.
         self.update_camera(distance=0.1, elevation=5)
         
         # Define an enclosing cube on the first frame.
