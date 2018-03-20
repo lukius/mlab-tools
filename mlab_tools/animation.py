@@ -55,8 +55,8 @@ class Animation(object):
     the animation will be called frame after frame.
     """
 
-    def __init__(self, width, height):
-        figure = mlab.figure(size=(width, height))
+    def __init__(self, width, height, bgcolor=None):
+        figure = mlab.figure(size=(width, height), bgcolor=bgcolor)
         visual.set_viewer(figure)
         
         self.width = width
