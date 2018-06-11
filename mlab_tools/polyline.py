@@ -89,6 +89,7 @@ class AnimatedPolyLine(PolyLine):
         """        
         PolyLine.__init__(self, points)
         self.initial_frame = initial_frame
+        self.current_point_idx = 0
 
     def _configure(self, points):
         PolyLine._configure(self, self.points[:1])
@@ -100,5 +101,9 @@ class AnimatedPolyLine(PolyLine):
             frame_no = abs_frame_no - self.initial_frame
             if frame_no >= len(self.points): Stop()
             self.add_point(self.points[frame_no])
+            self.current_point_idx = frame_no
 
         return anim
+    
+    def current_point(self):
+        return self.current_point_idx

@@ -5,6 +5,23 @@ from polyhedron import Polyhedron
 from tvtk.api import tvtk
 
 
+class Geometry(object):
+
+    def __init__(self):
+        self.polys = dict()
+        
+    def add_named_polyhedron(self, poly, name):
+        if name in self.polys:
+            raise Exception('Polyhedron {} already registered!'.format(name))
+        self.polys[name] = poly
+        
+    def get_polyhedron(self, name):
+        return self.polys.get(name)
+    
+    def __iter__(self):
+        return self.polys.iteritems()
+    
+    
 class GeometryParser(object):
     
     @classmethod
@@ -21,21 +38,21 @@ class GeometryParser(object):
 class VTKParser(GeometryParser):
     
     def _build_geometry(self, points, cells):
-        polys = list()
+        geometry = Geometry()
         
         for cell in cells:
-            vertices = tvtk.Points()
-            faces = tvtk.CellArray()            
+            cell_points = tvtk.Points()
+            faces = tvtk.CellArray()           
             
             vertex0 = points[cell[0]]
             vertex1 = points[cell[1]]
             vertex2 = points[cell[2]]
             vertex3 = points[cell[3]]
             
-            vertices.insert_next_point(vertex0)
-            vertices.insert_next_point(vertex1)
-            vertices.insert_next_point(vertex2)
-            vertices.insert_next_point(vertex3)
+            cell_points.insert_next_point(vertex0)
+            cell_points.insert_next_point(vertex1)
+            cell_points.insert_next_point(vertex2)
+            cell_points.insert_next_point(vertex3)
             
             polygon = tvtk.Polygon()
             polygon.point_ids.number_of_ids = 3
@@ -63,11 +80,14 @@ class VTKParser(GeometryParser):
             polygon.point_ids.set_id(0, 1)
             polygon.point_ids.set_id(1, 3)
             polygon.point_ids.set_id(2, 2)          
-            faces.insert_next_cell(polygon)  
+            faces.insert_next_cell(polygon)
             
-            polys.append(Polyhedron(vertices, faces))
+            polyhedron = Polyhedron(cell_points, faces)
+            name = 'Tetra-{}-{}-{}-{}'.format(*cell)
+            
+            geometry.add_named_polyhedron(polyhedron, name)
         
-        return polys
+        return geometry
     
     def parse(self):
         points = list()
