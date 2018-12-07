@@ -15,24 +15,28 @@ class SphereMeshAnimation(Animation):
         self.parse_trajectory()
         volume_names = map(lambda (time, volume): volume, self.volumes)
         
-        parser = GeometryParser.from_VTK('data/sphere.vtk')
+        parser = GeometryParser.from_VTK('data/sphere_scaled.vtk')
         self.geometry = parser.parse()
+        self.polys = list()
         
         for name, polyhedron in self.geometry:
-            if name not in volume_names:
-                continue
-            polyhedron.transform(scale=100)
-            polyhedron.transform(translate=0.1)
-            self.add_object(polyhedron, opacity=0.01)
+            if name in volume_names:
+                self.polys.append(polyhedron)
+                self.add_object(polyhedron, opacity=0.1)
+                
+            elif name in self.boundary:
+                self.polys.append(polyhedron)
+                self.add_object(polyhedron, opacity=0.01)
             
-        self.update_camera(focalpoint=[10, -30, 10],
-                           distance=1000,
+        self.update_camera(focalpoint=[0,0,0],
+                           distance=3000,
                            azimuth=0,
                            elevation=180,
                            roll=0)
             
     def parse_volumes(self):
         self.volumes = list()
+        self.boundary = list()
         
         with open('data/retQSS_volumes', 'r') as _file:
             lines = _file.readlines()
@@ -41,6 +45,11 @@ class SphereMeshAnimation(Animation):
                 time = float(fields[0])
                 volume = fields[1]
                 self.volumes.append((time, volume))
+                
+        with open('data/sphere_scaled_boundary', 'r') as _file:
+            lines = _file.readlines()
+            for line in lines:
+                self.boundary.append(line.strip())
                 
         self.current_volume_idx = 0
         self.last_polyhedron = None
@@ -52,7 +61,7 @@ class SphereMeshAnimation(Animation):
         with open('data/retQSS_trajectory', 'r') as _file:
             lines = _file.readlines()
             for line in lines:
-                time, x, y, z = map(float, line.split())
+                time, x, y, z = map(float, line.split()[:-1])
                 points.append((x,y,z))
                 self.times.append(time)
                 
@@ -63,7 +72,13 @@ class SphereMeshAnimation(Animation):
         current_point_idx = self.trajectory.current_point()
         time = self.times[current_point_idx]
         
-        self.update_camera(roll=0.1, distance=-0.7, elevation=-0.1)
+        for poly in self.polys:
+            poly.transform(rotate=0.1)
+        self.trajectory.transform(rotate=0.1)
+        
+        dist = self.get_camera().parameters()['distance']
+        if dist > 791:
+            self.update_camera(distance=-2)
         
         volume_name = self.volumes[self.current_volume_idx][1]
         if volume_name == 'World':
@@ -76,16 +91,19 @@ class SphereMeshAnimation(Animation):
             volume_name = self.volumes[self.current_volume_idx][1]
             print 'Entering volume {}...'.format(volume_name)
             
-            polyhedron = self.geometry.get_polyhedron(volume_name)
-            polyhedron.update_properties(color=(0.7,0,0), opacity=0.3)
+            if volume_name != 'World':
+                polyhedron = self.geometry.get_polyhedron(volume_name)
+                polyhedron.update_properties(color=(0.7,0,0), opacity=0.3)
+                self.last_polyhedron = polyhedron
+            else:
+                self.last_polyhedron = None
             
             self.current_volume_idx += 1
-            self.last_polyhedron = polyhedron
         
 
 def run_animation():
     animation = SphereMeshAnimation(640, 480)
-    animation.run(delay=300, save_to='sphere')
+    animation.run(delay=20, save_to='sphere')
 
 
 if __name__ == '__main__':
