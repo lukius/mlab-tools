@@ -44,6 +44,9 @@ class PolyLine(PolyObject):
         self.poly_data = tvtk.PolyData(points=self.vtk_points, lines=self.lines)
 
         self._set_actor()
+        
+    def num_points(self):
+        return len(self.points)
 
     def add_point(self, point):
         """Adds a point to the polyline.
