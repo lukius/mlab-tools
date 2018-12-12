@@ -62,42 +62,42 @@ class VTKParser(GeometryParser):
         return cell_points
     
     def _build_tetrahedron(self, cell, points):
-            faces = tvtk.CellArray()
-            
-            for i0,i1,i2 in [(0,1,2), (0,3,1), (0,2,3), (1,3,2)]:
-                polygon = tvtk.Polygon()
-                polygon.point_ids.number_of_ids = 3
-                polygon.point_ids.set_id(0, i0)
-                polygon.point_ids.set_id(1, i1)
-                polygon.point_ids.set_id(2, i2)          
-                faces.insert_next_cell(polygon)
+        faces = tvtk.CellArray()
+        
+        for i0,i1,i2 in [(0,1,2), (0,3,1), (0,2,3), (1,3,2)]:
+            polygon = tvtk.Polygon()
+            polygon.point_ids.number_of_ids = 3
+            polygon.point_ids.set_id(0, i0)
+            polygon.point_ids.set_id(1, i1)
+            polygon.point_ids.set_id(2, i2)          
+            faces.insert_next_cell(polygon)
 
-            cell_points = self._get_cell_points(cell, points)
-            
-            poly = Polyhedron(cell_points, faces)
-            name = 'Tetra-{}-{}-{}-{}'.format(*cell)
-            
-            return poly, name
+        cell_points = self._get_cell_points(cell, points)
+        
+        poly = Polyhedron(cell_points, faces)
+        name = 'Tetra-{}-{}-{}-{}'.format(*cell)
+        
+        return poly, name
         
     def _build_voxel(self, cell, points):
-            faces = tvtk.CellArray()
-            
-            for i0,i1,i2,i3 in [(0,1,3,2), (1,3,7,5), (5,7,6,4), (4,0,2,6),
-                                (6,2,3,7), (0,1,5,4)]:
-                polygon = tvtk.Polygon()
-                polygon.point_ids.number_of_ids = 4
-                polygon.point_ids.set_id(0, i0)
-                polygon.point_ids.set_id(1, i1)
-                polygon.point_ids.set_id(2, i2)
-                polygon.point_ids.set_id(3, i3)     
-                faces.insert_next_cell(polygon)
-            
-            cell_points = self._get_cell_points(cell, points)
-            
-            poly = Polyhedron(cell_points, faces)
-            name = 'Voxel-{}-{}-{}-{}-{}-{}-{}-{}'.format(*cell)
-            
-            return poly, name
+        faces = tvtk.CellArray()
+        
+        for i0,i1,i2,i3 in [(0,1,3,2), (1,3,7,5), (5,7,6,4), (4,0,2,6),
+                            (6,2,3,7), (0,1,5,4)]:
+            polygon = tvtk.Polygon()
+            polygon.point_ids.number_of_ids = 4
+            polygon.point_ids.set_id(0, i0)
+            polygon.point_ids.set_id(1, i1)
+            polygon.point_ids.set_id(2, i2)
+            polygon.point_ids.set_id(3, i3)     
+            faces.insert_next_cell(polygon)
+        
+        cell_points = self._get_cell_points(cell, points)
+        
+        poly = Polyhedron(cell_points, faces)
+        name = 'Voxel-{}-{}-{}-{}-{}-{}-{}-{}'.format(*cell)
+        
+        return poly, name
     
     def parse(self):
         points = list()
