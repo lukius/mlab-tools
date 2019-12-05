@@ -2,24 +2,36 @@ import re
 
 from polyhedron import Polyhedron
 
+from collections import OrderedDict
 from tvtk.api import tvtk
 
 
 class Geometry(object):
 
     def __init__(self):
-        self.polys = dict()
+        self.polys_by_id = OrderedDict()
+        self.polys_by_name = dict()
         
-    def add_named_polyhedron(self, poly, name):
-        if name in self.polys:
+    def add_named_polyhedron(self, poly, name, pid):
+        if name in self.polys_by_name:
             raise Exception('Polyhedron {} already registered!'.format(name))
-        self.polys[name] = poly
+        if pid in self.polys_by_id:
+            raise Exception('Polyhedron ID {} already exists!'.format(pid))
+        
+        self.polys_by_name[name] = poly
+        self.polys_by_id[pid] = poly
         
     def get_polyhedron(self, name):
-        return self.polys.get(name)
+        return self.polys_by_name.get(name)
+    
+    def get_polyhedron_by_ID(self, pid):
+        return self.polys_by_id.get(pid)
+    
+    def num_polyhedrons(self):
+        return len(self.polys_by_id)
     
     def __iter__(self):
-        return self.polys.iteritems()
+        return self.polys_by_id.iteritems()
     
     
 class GeometryParser(object):
@@ -30,6 +42,7 @@ class GeometryParser(object):
     
     def __init__(self, filename):
         self.filename = filename
+        self.current_id = 1
     
     def parse(self):
         raise NotImplementedError
@@ -48,7 +61,8 @@ class VTKParser(GeometryParser):
             elif cell_type == 11:
                 poly, name = self._build_voxel(cell, points)
 
-            geometry.add_named_polyhedron(poly, name)
+            geometry.add_named_polyhedron(poly, name, self.current_id)
+            self.current_id += 1
         
         return geometry
     
