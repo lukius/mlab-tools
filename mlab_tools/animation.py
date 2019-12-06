@@ -7,6 +7,11 @@ from mayavi import mlab
 from tvtk.api import tvtk
 from tvtk.tools import visual
 
+try:
+    import cv2
+except ImportError:
+    cv2 = None
+
 from camera import Camera
 
 
@@ -154,22 +159,35 @@ class Animation(object):
         if obj in self.obj_animations:
             del self.obj_animations[obj]
         self._remove_actor(obj.get_actor())
+        
+    def _get_image_resolution(self, tmp_dir, filename):
+        img = cv2.imread('%s/%s_1.png' % (tmp_dir, filename))
+        height, width, _ = img.shape
+        return height, width
 
     def _assemble_video(self, directory, filename, tmp_dir, framerate):
         # Compiles the saved PNG frames into a video using the OpenCV library.
-        
-        import cv2
-
         # TODO: add support for OpenCV 3.0.
+        if cv2 is None:
+            raise RuntimeError('OpenCV not found! Video cannot be saved.')
+        
+        height, width = self._get_image_resolution(tmp_dir, filename)
         video = cv2.VideoWriter('%s/%s.avi' % (directory, filename),
                                 cv2.cv.CV_FOURCC(*'XVID'),
                                 framerate,
-                                (self.width, self.height - 50))
+                                (width, height))
 
         frames = glob.glob('%s/*.png' % tmp_dir)
 
         for i in xrange(1, len(frames)+1):
-            frame_img = cv2.imread('%s/%s_%d.png' % (tmp_dir, filename, i))
+            frame_filename = '%s/%s_%d.png' % (tmp_dir, filename, i)
+            frame_img = cv2.imread(frame_filename)
+            
+            frame_height, frame_width, _ = frame_img.shape
+            if frame_height != height or frame_width != width:
+                msg = 'Frame %s has invalid resolution!' % frame_filename
+                raise RuntimeError(msg)
+            
             video.write(frame_img)
 
         video.release()
