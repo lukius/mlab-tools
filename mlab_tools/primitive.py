@@ -16,6 +16,10 @@ class Primitive(Object):
 
     def _get_primitive(self):
         raise NotImplementedError
+    
+    def set_center(self, center):
+        self.primitive.center = center
+        self.primitive.update()
 
     def _configure(self):
         self.primitive = self._get_primitive()
