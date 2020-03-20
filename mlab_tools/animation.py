@@ -149,6 +149,11 @@ class Animation(object):
 
         self.obj_animations[obj] = anim
 
+    def add_static_object(self, obj, **props):
+        obj.update_properties(**props)
+
+        self._add_actor(obj.get_actor())
+
     def remove_object(self, obj):
         """Removes an object from the scene.
         

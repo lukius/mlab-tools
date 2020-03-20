@@ -21,6 +21,9 @@ class Primitive(Object):
         self.primitive.center = center
         self.primitive.update()
 
+    def get_center(self):
+        return self.primitive.center
+
     def _configure(self):
         self.primitive = self._get_primitive()
         self.mapper = tvtk.PolyDataMapper()
@@ -81,6 +84,13 @@ class Cone(Primitive):
     def set_direction(self, direction):
         self.primitive.direction = direction
         self.primitive.update()
+
+    def set_height(self, height):
+        self.primitive.height = height
+        self.primitive.update()
+
+    def get_height(self):
+        return self.primitive.height
         
     def _get_primitive(self):
         return tvtk.ConeSource(center=self.center,
